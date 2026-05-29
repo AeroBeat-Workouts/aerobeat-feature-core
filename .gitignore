@@ -19,3 +19,7 @@ mono_crash.*.json
 .dolt/
 *.db
 .beads-credential-key
+
+.claude/
+CLAUDE.md
+AGENTS.md
