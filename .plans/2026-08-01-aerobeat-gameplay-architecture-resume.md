@@ -423,7 +423,7 @@ Recommended rename sequence:
 **Files Created/Deleted/Modified:**
 - `Pending QA output`
 
-**Status:** In Progress
+**Status:** Complete
 
 **Results:** QA passed and closed bead `afc-p0z`. Evidence: runner remote is `git@github.com:AeroBeat-Workouts/aerobeat-gameplay-runner.git`, branch `main`, HEAD `a862f27d14d1d9e15691dac1ac1487cc75921097` matches `origin/main`; root has no `project.godot`, no `addons.jsonc`, and no GodotEnv manifest; `.testbed/` owns `project.godot`, `addons.jsonc`, scenes, tests, and showcase asset note; `godotenv addons install`, Godot headless import, and GUT passed with 1 script / 1 test / 9 assertions. Repo ended clean and up to date.
 
@@ -468,7 +468,53 @@ Recommended rename sequence:
 
 **Status:** In Progress
 
-**Results:** Spawned `primary` coder subagent `aerobeat_mode_repo_rename`. Awaiting completion.
+**Results:** Completed in-place GitHub/local rename wave and focused repair. GitHub repos and local folders now use `aerobeat-mode-core`, `aerobeat-mode-boxing`, `aerobeat-mode-flow`, and `aerobeat-template-mode`. Pushed commits: mode-core `65b4edb` then repair `912ae79`; mode-boxing `d80286b` then repair `0106a50`; mode-flow `1857699` then repair `795e02a`; template-mode `0fa83f0`. Orchestrator verification confirmed all four repos are clean on `main...origin/main`, remotes point to renamed GitHub repos, GitHub repo views resolve, local feature-named folders are gone, and residual active old-name scan only reports historical audit notes in this plan. Serialized content schema migration was intentionally not touched in this bead.
+
+---
+
+### Task 11: QA Verify Mode Repo Rename Wave
+
+**Bead ID:** `afc-qrj`
+**SubAgent:** `primary`
+**Role:** `qa`
+**References:** `REF-02`, `REF-03`, `REF-04`
+**Prompt:** You are the `qa` role on the `primary` lane for AeroBeat. Claim bead `afc-qrj` with `bd update afc-qrj --status in_progress --json`. Independently verify the in-place mode repo rename wave: GitHub repos, local folders/remotes, commits, clean statuses, residual old-name scans, active label/test updates, and confirmation that `aerobeat-content-core` and `aerobeat-tool-content-authoring` schema were not changed in this bead. Update and close bead `afc-qrj` if QA passes.
+
+**Folders Created/Deleted/Modified:**
+- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-mode-core/`
+- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-mode-boxing/`
+- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-mode-flow/`
+- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-template-mode/`
+
+**Files Created/Deleted/Modified:**
+- `Pending QA output`
+
+**Status:** In Progress
+
+**Results:** Spawned `primary` QA subagent `aerobeat_mode_repo_rename_qa`. Awaiting QA completion.
+
+---
+
+### Task 12: Audit Mode Repo Rename Wave
+
+**Bead ID:** `afc-dog`
+**SubAgent:** `primary`
+**Role:** `auditor`
+**References:** `REF-02`, `REF-03`, `REF-04`
+**Prompt:** You are the `auditor` role on the `primary` lane for AeroBeat. Claim bead `afc-dog` with `bd update afc-dog --status in_progress --json` after QA bead `afc-qrj` is closed. Independently audit the mode repo rename wave against the plan, bead `afc-b1o`, QA evidence, GitHub repo state, local folders/remotes, and residual reference scans. Close bead `afc-dog` only if the rename is truthful and pushed.
+
+**Folders Created/Deleted/Modified:**
+- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-mode-core/`
+- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-mode-boxing/`
+- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-mode-flow/`
+- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-template-mode/`
+
+**Files Created/Deleted/Modified:**
+- `Pending auditor output`
+
+**Status:** Pending QA
+
+**Results:** Blocked by QA bead `afc-qrj`.
 
 ---
 
