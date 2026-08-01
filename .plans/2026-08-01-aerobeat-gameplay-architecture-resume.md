@@ -449,6 +449,29 @@ Recommended rename sequence:
 
 ---
 
+### Task 10: Execute In-Place Feature Repo Rename To Mode Repos
+
+**Bead ID:** `afc-b1o`
+**SubAgent:** `primary`
+**Role:** `coder`
+**References:** `REF-02`, `REF-03`, `REF-04`
+**Prompt:** You are the `coder` role on the `primary` lane for AeroBeat. Claim bead `afc-b1o` with `bd update afc-b1o --status in_progress --json`. Execute the approved in-place rename for `aerobeat-feature-core`, `aerobeat-feature-boxing`, `aerobeat-feature-flow`, and `aerobeat-template-feature` to `aerobeat-mode-core`, `aerobeat-mode-boxing`, `aerobeat-mode-flow`, and `aerobeat-template-mode`. Rename GitHub repos in place, local folders, origin remotes, repo-local README/plugin/project labels, GodotEnv manifest references, and the active plan path as needed. Do not perform `aerobeat-content-core` serialized schema migration in this bead. Commit and push touched repos. Update and close bead `afc-b1o` from the new `aerobeat-mode-core` path when complete.
+
+**Folders Created/Deleted/Modified:**
+- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-feature-core/` -> `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-mode-core/`
+- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-feature-boxing/` -> `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-mode-boxing/`
+- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-feature-flow/` -> `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-mode-flow/`
+- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-template-feature/` -> `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-template-mode/`
+
+**Files Created/Deleted/Modified:**
+- `Pending coder output`
+
+**Status:** In Progress
+
+**Results:** Spawned `primary` coder subagent `aerobeat_mode_repo_rename`. Awaiting completion.
+
+---
+
 ## Final Results
 
 **Status:** Pending
