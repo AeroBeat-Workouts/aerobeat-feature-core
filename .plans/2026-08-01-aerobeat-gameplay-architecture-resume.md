@@ -2,7 +2,7 @@
 
 **Date:** 2026-08-01
 **Status:** Complete
-**Last Updated:** 2026-08-01 16:05 EDT
+**Last Updated:** 2026-08-01 16:20 EDT
 **Blocked Reason:** None
 **Agent:** pico
 
@@ -10,7 +10,7 @@
 
 ## Goal
 
-Freeze the next AeroBeat gameplay feature architecture by mapping feature, content, input, assembly, and possible new gameplay-boundary repo responsibilities before any Boxing or Flow implementation begins.
+Freeze the next AeroBeat gameplay mode architecture by mapping mode, content, input, assembly, and possible new gameplay-boundary repo responsibilities before any Boxing or Flow implementation begins.
 
 ---
 
@@ -73,7 +73,7 @@ This section is the live discussion surface. The runner boundary, repo rename di
 - `aerobeat-content-core`: durable song-package, song, chart, set, schema, validation, and authored/imported content relationship rules, including Boxing/Flow chart object vocabulary where it is content truth rather than runtime behavior. Canonical schema terminology should migrate from `feature` to `mode` in this wave.
 - `aerobeat-input-core`: stable provider/session/intent contracts, `BoxingInput`, `FlowInput`, `BodyCellInput`, UI interaction bridge contracts, and normalized lifecycle seams.
 - `aerobeat-tool-camera-tracking`: vendor-agnostic camera lifecycle, source selection, preview ownership, backend resolution, and normalized tracking-frame publication.
-- `aerobeat-input-camera-tracking`: camera gameplay interpretation layer that turns normalized `CameraTracking` frames into current Boxing/Flow input intents; it owns detector truth and should stay below feature rule evaluation.
+- `aerobeat-input-camera-tracking`: camera gameplay interpretation layer that turns normalized `CameraTracking` frames into current Boxing/Flow input intents; it owns detector truth and should stay below mode rule evaluation.
 - concrete input repos: device/provider packages that bridge hardware/runtime details into `aerobeat-input-core` contracts; future providers remain future until promoted.
 - `aerobeat-tool-content-authoring` and `aerobeat-vendor-beatsaver`: acquisition, staging, conversion, and authoring workflows; they should emit/validate content through `aerobeat-content-core` rather than own runtime gameplay behavior.
 - `aerobeat-assembly-community`: runnable PC community app composition, dependency pinning, camera sidecar packaging, product scenes, and integration tests.
@@ -84,11 +84,11 @@ There appears to be a clean potential boundary for a shared gameplay session/run
 
 - recommended name: `aerobeat-gameplay-runner`
 - fallback names if Derrick dislikes that shape: `aerobeat-runtime-gameplay` or `aerobeat-gameplay-core`
-- owner role: runtime composition state that is neither pure feature contract nor Boxing/Flow-specific logic
-- concrete responsibilities: selected song package/chart, active feature runner selection, timeline clock binding to audio, input subscription wiring, event dispatch, per-session lifecycle, pause/resume/retry, common gameplay result envelope, and assembly-facing scene/controller glue
-- possible consumers: assemblies, feature workbenches, and future product-specific clients
+- owner role: runtime composition state that is neither pure mode contract nor Boxing/Flow-specific logic
+- concrete responsibilities: selected song package/chart, active mode runner selection, timeline clock binding to audio, input subscription wiring, event dispatch, per-session lifecycle, pause/resume/retry, common gameplay result envelope, and assembly-facing scene/controller glue
+- possible consumers: assemblies, mode workbenches, and future product-specific clients
 - possible dependencies: target `aerobeat-mode-core`, `aerobeat-content-core`, `aerobeat-input-core`, and narrowly any timing/audio contract if needed
-- explicit non-goals: no camera lifecycle, no detector logic, no BeatSaver conversion, no UI shell chrome, no environment loading, no concrete feature-specific judgement
+- explicit non-goals: no camera lifecycle, no detector logic, no BeatSaver conversion, no UI shell chrome, no environment loading, no concrete mode-specific judgement
 
 The open question is whether this layer earns a new repo now, or whether the first implementation wave can keep the conductor inside `aerobeat-assembly-community` until the shared seam is proven.
 
@@ -295,7 +295,7 @@ Recommended rename sequence:
 **SubAgent:** `primary`
 **Role:** `research`
 **References:** `REF-02`, `REF-03`, `REF-04`
-**Prompt:** You are the `research` role on the `primary` lane for AeroBeat architecture documentation. Using the Task 1 findings, draft a discussion-ready architecture freeze proposal that defines the first implementation split across `aerobeat-mode-core`, `aerobeat-mode-boxing`, `aerobeat-mode-flow`, `aerobeat-content-core`, input repos, assembly/workbench repos, and any recommended new repos. Keep the output to architecture, repo boundaries, dependency direction, and execution sequencing only; do not implement runtime feature code. Update bead `afc-n5l` with the proposal; do not close it.
+**Prompt:** You are the `research` role on the `primary` lane for AeroBeat architecture documentation. Using the Task 1 findings, draft a discussion-ready architecture freeze proposal that defines the first implementation split across `aerobeat-mode-core`, `aerobeat-mode-boxing`, `aerobeat-mode-flow`, `aerobeat-content-core`, input repos, assembly/workbench repos, and any recommended new repos. Keep the output to architecture, repo boundaries, dependency direction, and execution sequencing only; do not implement runtime mode code. Update bead `afc-n5l` with the proposal; do not close it.
 
 **Folders Created/Deleted/Modified:**
 - `.plans/`
@@ -305,7 +305,7 @@ Recommended rename sequence:
 
 **Status:** In Review
 
-**Results:** Drafted proposal now recommends `aerobeat-gameplay-runner` as the shared gameplay orchestration boundary rather than placing session/timeline/input/content/feature composition in `feature-core`, concrete mode repos, or the PC community assembly.
+**Results:** Drafted proposal now recommends `aerobeat-gameplay-runner` as the shared gameplay orchestration boundary rather than placing session/timeline/input/content/mode composition in mode-core, concrete mode repos, or the PC community assembly.
 
 ---
 
@@ -315,7 +315,7 @@ Recommended rename sequence:
 **SubAgent:** `primary`
 **Role:** `auditor`
 **References:** `REF-01`, `REF-02`, `REF-03`, `REF-04`, `REF-05`
-**Prompt:** You are the `auditor` role on the `primary` lane for AeroBeat. After Derrick reviews the proposal, verify that the frozen architecture is reflected in the plan, that implementation remains blocked until the freeze is explicit, and that any future implementation beads are clearly separated from this architecture bead. Confirm the plan does not reintroduce inactive Dance/Step language, does not blur feature/content/input/tool boundaries, and identifies any new repo creation boundary if needed. If Derrick freezes the architecture and the plan reflects it, close bead `afc-n5l` with the reason; otherwise leave it open with the exact unresolved decisions.
+**Prompt:** You are the `auditor` role on the `primary` lane for AeroBeat. After Derrick reviews the proposal, verify that the frozen architecture is reflected in the plan, that implementation remains blocked until the freeze is explicit, and that any future implementation beads are clearly separated from this architecture bead. Confirm the plan does not reintroduce inactive Dance/Step language, does not blur mode/content/input/tool boundaries, and identifies any new repo creation boundary if needed. If Derrick freezes the architecture and the plan reflects it, close bead `afc-n5l` with the reason; otherwise leave it open with the exact unresolved decisions.
 
 **Folders Created/Deleted/Modified:**
 - `.plans/`
@@ -449,7 +449,7 @@ Recommended rename sequence:
 
 ---
 
-### Task 10: Execute In-Place Feature Repo Rename To Mode Repos
+### Task 10: Execute In-Place Mode Repo Rename
 
 **Bead ID:** `afc-b1o`
 **SubAgent:** `primary`
@@ -478,7 +478,7 @@ Recommended rename sequence:
 
 **What We Built:** Architecture discussion plan and beads initialized. Runner boundary approved; rename audit and runner repo structure confirmation are now active. Implementation and GitHub repo generation remain deferred until Derrick confirms the scaffold shape.
 
-**Reference Check:** Research checked current feature, input, content, tool/vendor, assembly, environment, UI, docs, and handoff references. Derrick freeze decision pending.
+**Reference Check:** Research checked current mode, input, content, tool/vendor, assembly, environment, UI, docs, and handoff references. Derrick freeze decision pending.
 
 **Commits:**
 - Pending
