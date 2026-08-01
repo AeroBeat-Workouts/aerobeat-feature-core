@@ -2,8 +2,8 @@
 
 **Date:** 2026-08-01
 **Status:** In Progress
-**Last Updated:** 2026-08-01 17:47 EDT
-**Blocked Reason:** Pending Derrick architecture freeze decisions for bead `afc-n5l`; implementation planning should not advance until the gameplay boundaries and next implementation slice are explicitly frozen. Current freeze prompt is whether to accept or change the six recommended defaults for runner ownership, audio-clock delegation, pure mode rule engines plus optional workbenches, explicit Boxing/Flow input contracts, dual fixture strategy, and runner `.testbed` integration before assembly integration.
+**Last Updated:** 2026-08-01 18:06 EDT
+**Blocked Reason:** Partially frozen. Derrick accepted the runner ownership, audio delegation, mode repo shape, fixture strategy, and runner-first integration defaults. The only remaining discussion seam is concrete examples for the tentative Boxing/Flow input-contract split before final implementation planning.
 **Agent:** pico
 
 ---
@@ -31,6 +31,15 @@ Approved rename decisions:
 - Rename the original feature template repo in place to `aerobeat-template-mode` in the same wave.
 - Migrate serialized content/package/chart schema fields from `feature` to `mode` now; do not keep the legacy field as the canonical contract.
 - Treat compatibility/fixtures/importer/test updates as part of the schema migration rather than a deferred cleanup.
+
+Architecture freeze decisions accepted on 2026-08-01:
+
+- `aerobeat-gameplay-runner` owns song-run session orchestration, chart timeline dispatch, pause/resume/retry, common run result envelopes, and fanout of runtime events.
+- Runner does not implement audio-clock truth directly. It binds to timing from `aerobeat-audio-player` through the narrowest clock/timeline interface needed by gameplay.
+- Mode repos expose pure rule engines first, with optional Godot workbench/testbed scenes for examples and validation. They should not own final product UI shells or assembly-specific visuals.
+- Boxing primarily consuming explicit `BoxingInput` while Flow consumes `BodyCellInput` or Flow-shaped intents is tentatively accepted, pending concrete examples/suggestions to confirm the split feels right.
+- Fixtures should use both small purpose-built fixtures for focused contract/unit tests and BeatSaver-converted maps for full tests plus end-to-end runner `.testbed` Godot scene validation.
+- `aerobeat-assembly-community` is a late production-cycle consumer of the polyrepos. First integration should prove composition inside `aerobeat-gameplay-runner/.testbed` before wiring the assembly app.
 
 ---
 
@@ -113,13 +122,50 @@ The open question is whether this layer earns a new repo now, or whether the fir
 6. Implement mode-local pure rule engines against fixture charts and fake input intent streams before live camera binding.
 7. Wire `aerobeat-assembly-community` last through `addons.jsonc` once runner, modes, content contracts, and camera input composition are proven.
 
-### Unresolved Freeze Questions
+### Remaining Freeze Seam
 
-- Should the runner own audio-clock binding and chart timeline dispatch, or delegate clocking to an audio/tool package while only subscribing to timing events?
-- Should mode repos expose pure rule engines only, or also package Godot scenes/controllers for their in-game lane visuals?
-- For v1, should Boxing and Flow both consume the same `BodyCellInput` lane where possible, or should Boxing primarily consume explicit `BoxingInput` events and reserve body-cell for debug/calibration?
-- Should first fixtures come from converted BeatSaver `song-package.yaml` output, hand-authored minimal fixtures, or both?
-- Should `aerobeat-assembly-community` be the first integration target immediately, or should the new gameplay runner/workbench prove composition first?
+The v1 architecture is mostly frozen. The one remaining seam is showing concrete examples for why Boxing should primarily consume explicit `BoxingInput` while Flow consumes `BodyCellInput` or Flow-shaped intents. Derrick tentatively agrees, but wants to see examples/suggestions before fully freezing that input contract split.
+
+### Input Contract Example Recommendation
+
+The inspected contracts already support the proposed split:
+
+- `aerobeat-input-core/src/interfaces/body_cell_input.gd` owns generic calibrated body-cell events: `left_wrist_cell_entered(cell, direction)`, `right_wrist_cell_entered(cell, direction)`, `nose_cell_entered(cell, direction)`, and `calibration_session_updated(session)`.
+- `aerobeat-input-core/src/interfaces/boxing_input.gd` extends `BodyCellInput`, but the Boxing rule engine should primarily consume explicit boxing events: `straight_left(power)`, `straight_right(power)`, `hook_left(power)`, `hook_right(power)`, `uppercut_left(power)`, `uppercut_right(power)`, `guard_enabled/guard_disabled`, `squat_enabled/squat_disabled`, and `weave_left/right_enabled/disabled`.
+- `aerobeat-input-core/src/interfaces/flow_input.gd` extends `BodyCellInput` and currently only adds `squat_enabled/squat_disabled`. That means v1 Flow can treat body-cell entry as its main authored-note input and use Flow-specific state only when an authored beat needs it.
+
+Recommended runner/testbed envelopes should wrap existing signal names rather than replace them:
+
+```gdscript
+{
+	"contract": "aerobeat.input.boxing.v1",
+	"event": "straight_left",
+	"timestamp_ms": 18420,
+	"payload": {"power": 0.82},
+	"source": {"provider_id": "camera_tracking", "frame_index": 934, "confidence": 0.91}
+}
+```
+
+```gdscript
+{
+	"contract": "aerobeat.input.body_cell.v1",
+	"event": "left_wrist_cell_entered",
+	"timestamp_ms": 18420,
+	"payload": {"body_part": "left_wrist", "cell": 6, "direction": 3},
+	"source": {"provider_id": "camera_tracking", "calibration_id": "current"}
+}
+```
+
+The camera-tracking boundary should stay: normalized `CameraTracking` frame -> local landmark adapter -> detector substrate -> shared input-core events. Raw landmarks, detector debug dictionaries, punch-family state changes, and provider diagnostics remain provider/testbed-local unless a later plan deliberately promotes them.
+
+Recommended ownership:
+
+- `aerobeat-input-core`: stable signal names, body-cell grid semantics, direction names/constants, provider lifecycle/capability seams, calibration-session shape, and optional runner envelope vocabulary.
+- `aerobeat-input-camera-tracking`: pose-frame ingestion, calibration implementation, detector substrate, gesture/body-cell translation, YAML tuning, and debug payloads.
+- `aerobeat-mode-boxing`: authored boxing target -> explicit `BoxingInput` event evaluation, scoring windows, power thresholds, combo/streak state, and local tests.
+- `aerobeat-mode-flow`: authored BeatSaver-converted note -> `BodyCellInput` / small Flow state evaluation, direction/cell timing, squat authored beats if retained, and local tests.
+
+Before implementation, freeze/document direction names and the 4x3 body-cell grid: cell indexes are `0..11`, BeatSaver row-major / athlete-space top-left, and current detector code uses `0=up`, `1=down`, `2=right`, `3=left` for cell transitions in athlete-space grid terms. Do not promote camera-tracking debug signals such as punch-family `*_state_changed` into the shared v1 input contract.
 
 ## Proposed `aerobeat-gameplay-runner` Repo Shape
 
@@ -580,13 +626,33 @@ Recommended rename sequence:
 
 ---
 
+### Task 16: Draft Boxing And Flow Input Contract Examples
+
+**Bead ID:** `afc-10p`
+**SubAgent:** `primary`
+**Role:** `research`
+**References:** `REF-07`, `REF-10`, `REF-03`, `REF-04`
+**Prompt:** You are the `research` role on the `primary` lane for AeroBeat. Claim bead `afc-10p` with `bd update afc-10p --status in_progress --json`. Inspect `aerobeat-input-core`, `aerobeat-input-camera-tracking`, `aerobeat-mode-boxing`, and `aerobeat-mode-flow` enough to draft concrete examples for the tentative v1 input-contract split: Boxing primarily consumes explicit `BoxingInput`, while Flow consumes `BodyCellInput` or Flow-shaped intents. Do not implement code. Produce concise example payload shapes, translation boundaries, and recommendations for what should live in input-core versus camera-tracking versus each mode repo. Update bead `afc-10p` with findings; do not close `afc-n5l`.
+
+**Folders Created/Deleted/Modified:**
+- `.plans/`
+
+**Files Created/Deleted/Modified:**
+- `.plans/2026-08-01-aerobeat-gameplay-architecture-resume.md`
+
+**Status:** Complete
+
+**Results:** Research completed and bead `afc-10p` was closed. The recommendation is now recorded in the Input Contract Example Recommendation section: Boxing rules should evaluate explicit `BoxingInput` signals; Flow rules should evaluate `BodyCellInput` plus minimal Flow-specific state such as squat if retained; camera-tracking should translate normalized tracking frames into shared input-core events while keeping raw landmarks/debug/provider diagnostics local.
+
+---
+
 ## Final Results
 
-**Status:** Pending
+**Status:** Pending Derrick final input split confirmation
 
-**What We Built:** Architecture discussion plan and beads initialized. Runner boundary and repo structure were approved; `aerobeat-gameplay-runner` was generated and audited. The in-place `feature` repo/template rename to `mode` was implemented, QA verified, audited, committed, and pushed. Canonical serialized content schema migration from `feature` to `mode` was implemented as a hard-breaking migration, QA verified, audited, committed, and pushed.
+**What We Built:** Architecture discussion plan and beads initialized. Runner boundary and repo structure were approved; `aerobeat-gameplay-runner` was generated and audited. The in-place `feature` repo/template rename to `mode` was implemented, QA verified, audited, committed, and pushed. Canonical serialized content schema migration from `feature` to `mode` was implemented as a hard-breaking migration, QA verified, audited, committed, and pushed. The architecture freeze is now accepted except for Derrick's final confirmation of the input-contract example recommendation.
 
-**Reference Check:** Research checked current mode, input, content, tool/vendor, assembly, environment, UI, docs, and handoff references. Derrick approved the runner boundary, root/testbed shape, in-place mode repo rename, template rename, and canonical schema migration. Final architecture freeze for gameplay implementation is still pending discussion.
+**Reference Check:** Research checked current mode, input, content, tool/vendor, assembly, environment, UI, docs, and handoff references. Derrick approved the runner boundary, root/testbed shape, in-place mode repo rename, template rename, canonical schema migration, runner use of `aerobeat-audio-player` timing, fixture strategy, and runner-first integration. Final architecture freeze for gameplay implementation is pending only the input-contract split confirmation.
 
 **Commits:**
 - `a862f27` - Create gameplay runner scaffold (`aerobeat-gameplay-runner`)
