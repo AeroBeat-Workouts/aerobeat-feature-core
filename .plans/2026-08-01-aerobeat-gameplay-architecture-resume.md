@@ -2,7 +2,7 @@
 
 **Date:** 2026-08-01
 **Status:** In Progress
-**Last Updated:** 2026-08-01 16:25 EDT
+**Last Updated:** 2026-08-01 16:31 EDT
 **Blocked Reason:** None
 **Agent:** pico
 
@@ -514,7 +514,70 @@ Recommended rename sequence:
 
 **Status:** In Progress
 
-**Results:** QA bead `afc-qrj` is closed. Spawned `primary` auditor subagent `aerobeat_mode_repo_rename_audit` for bead `afc-dog` at 2026-08-01 16:25 EDT.
+**Results:** Audit passed and closed bead `afc-dog` at 2026-08-01 16:29 EDT. Evidence checked: GitHub repos resolve under the approved `aerobeat-mode-*` and `aerobeat-template-mode` names, old GitHub names redirect to renamed repos, local old folders are absent, new folders/remotes are renamed, all four checkouts are clean on `main` with `HEAD == origin/main`, expected rename commits are pushed, residual exact old-name scans outside archive/history are clean, and remaining active-plan `feature` mentions are explicit audit/schema-migration narrative rather than live repo identity. The auditor correctly scoped this bead to the in-place repo/template rename wave; serialized content schema migration remains a separate approved slice.
+
+---
+
+### Task 13: Execute Canonical Content Schema Migration
+
+**Bead ID:** `aerobeat-content-core-v28`
+**SubAgent:** `primary`
+**Role:** `coder`
+**References:** `REF-06`
+**Prompt:** You are the `coder` role on the `primary` lane for AeroBeat. Claim bead `aerobeat-content-core-v28` in `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-content-core` with `bd update aerobeat-content-core-v28 --status in_progress --json`. Migrate canonical AeroBeat serialized content/package/chart schema terminology from `feature` to `mode` across `aerobeat-content-core` and `aerobeat-tool-content-authoring`. Update validators, DTO names as appropriate, fixtures, tests, importer/tooling output, docs/examples, and error codes such as `invalid_feature` / `chart_descriptor_feature_mismatch` to mode terminology. Do not keep legacy `feature` as canonical output; any temporary read compatibility must be explicit and tested. Run relevant repo validations, commit and push touched repos, and update/close the bead when complete. Note that Beads Dolt auto-push is currently warning with `no common ancestor`; do not treat code push success as bead push success.
+
+**Folders Created/Deleted/Modified:**
+- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-content-core/`
+- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-tool-content-authoring/`
+
+**Files Created/Deleted/Modified:**
+- `Pending coder output`
+
+**Status:** In Progress
+
+**Results:** Bead created and linked into the plan. QA and audit beads now depend on this implementation bead. Spawned `primary` coder subagent `aerobeat_content_schema_mode_migration` at 2026-08-01 16:31 EDT.
+
+---
+
+### Task 14: QA Verify Canonical Content Schema Migration
+
+**Bead ID:** `aerobeat-content-core-56d`
+**SubAgent:** `primary`
+**Role:** `qa`
+**References:** `REF-06`
+**Prompt:** You are the `qa` role on the `primary` lane for AeroBeat. Claim bead `aerobeat-content-core-56d` in `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-content-core` with `bd update aerobeat-content-core-56d --status in_progress --json` after implementation bead `aerobeat-content-core-v28` is closed. Independently verify the canonical `feature` to `mode` schema migration. Check `aerobeat-content-core` and `aerobeat-tool-content-authoring` diffs, tests, fixtures, docs/examples, importer output, validation errors, residual `feature` scans, clean pushed git state, and that legacy `feature` is not the canonical serialized field. Update and close the bead if QA passes.
+
+**Folders Created/Deleted/Modified:**
+- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-content-core/`
+- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-tool-content-authoring/`
+
+**Files Created/Deleted/Modified:**
+- `Pending QA output`
+
+**Status:** Pending
+
+**Results:** Bead created with dependency on `aerobeat-content-core-v28`.
+
+---
+
+### Task 15: Audit Canonical Content Schema Migration
+
+**Bead ID:** `aerobeat-content-core-5sd`
+**SubAgent:** `primary`
+**Role:** `auditor`
+**References:** `REF-06`
+**Prompt:** You are the `auditor` role on the `primary` lane for AeroBeat. Claim bead `aerobeat-content-core-5sd` in `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-content-core` with `bd update aerobeat-content-core-5sd --status in_progress --json` after QA bead `aerobeat-content-core-56d` is closed. Independently audit the canonical `feature` to `mode` schema migration against this active plan, implementation bead `aerobeat-content-core-v28`, QA bead `aerobeat-content-core-56d`, diffs, validation evidence, residual scans, and pushed repo state. Close only if the schema migration is truthful, complete, and pushed.
+
+**Folders Created/Deleted/Modified:**
+- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-content-core/`
+- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-tool-content-authoring/`
+
+**Files Created/Deleted/Modified:**
+- `Pending auditor output`
+
+**Status:** Pending
+
+**Results:** Bead created with dependency on `aerobeat-content-core-56d`.
 
 ---
 
@@ -522,7 +585,7 @@ Recommended rename sequence:
 
 **Status:** Pending
 
-**What We Built:** Architecture discussion plan and beads initialized. Runner boundary approved; rename audit and runner repo structure confirmation are now active. Implementation and GitHub repo generation remain deferred until Derrick confirms the scaffold shape.
+**What We Built:** Architecture discussion plan and beads initialized. Runner boundary and repo structure were approved; `aerobeat-gameplay-runner` was generated and audited. The in-place `feature` repo/template rename to `mode` was implemented, QA verified, audited, committed, and pushed. Canonical serialized content schema migration from `feature` to `mode` is now the next implementation slice.
 
 **Reference Check:** Research checked current mode, input, content, tool/vendor, assembly, environment, UI, docs, and handoff references. Derrick freeze decision pending.
 
