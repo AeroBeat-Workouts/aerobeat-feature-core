@@ -1,9 +1,9 @@
 # AeroBeat Gameplay Architecture Resume
 
 **Date:** 2026-08-01
-**Status:** In Progress
-**Last Updated:** 2026-08-01 18:06 EDT
-**Blocked Reason:** Partially frozen. Derrick accepted the runner ownership, audio delegation, mode repo shape, fixture strategy, and runner-first integration defaults. The only remaining discussion seam is concrete examples for the tentative Boxing/Flow input-contract split before final implementation planning.
+**Status:** Complete
+**Last Updated:** 2026-08-01 18:34 EDT
+**Blocked Reason:** None. Architecture freeze discussion is complete; implementation still requires a separate approved implementation plan.
 **Agent:** pico
 
 ---
@@ -37,7 +37,7 @@ Architecture freeze decisions accepted on 2026-08-01:
 - `aerobeat-gameplay-runner` owns song-run session orchestration, chart timeline dispatch, pause/resume/retry, common run result envelopes, and fanout of runtime events.
 - Runner does not implement audio-clock truth directly. It binds to timing from `aerobeat-audio-player` through the narrowest clock/timeline interface needed by gameplay.
 - Mode repos expose pure rule engines first, with optional Godot workbench/testbed scenes for examples and validation. They should not own final product UI shells or assembly-specific visuals.
-- Boxing primarily consuming explicit `BoxingInput` while Flow consumes `BodyCellInput` or Flow-shaped intents is tentatively accepted, pending concrete examples/suggestions to confirm the split feels right.
+- Boxing primarily consumes explicit per-arm `BoxingInput` punch events and stance/state events. Punches are active/inactive events only; v1 does not include punch power or strength. Flow consumes `BodyCellInput` or Flow-shaped intents.
 - Fixtures should use both small purpose-built fixtures for focused contract/unit tests and BeatSaver-converted maps for full tests plus end-to-end runner `.testbed` Godot scene validation.
 - `aerobeat-assembly-community` is a late production-cycle consumer of the polyrepos. First integration should prove composition inside `aerobeat-gameplay-runner/.testbed` before wiring the assembly app.
 
@@ -122,16 +122,16 @@ The open question is whether this layer earns a new repo now, or whether the fir
 6. Implement mode-local pure rule engines against fixture charts and fake input intent streams before live camera binding.
 7. Wire `aerobeat-assembly-community` last through `addons.jsonc` once runner, modes, content contracts, and camera input composition are proven.
 
-### Remaining Freeze Seam
+### Freeze Status
 
-The v1 architecture is mostly frozen. The one remaining seam is showing concrete examples for why Boxing should primarily consume explicit `BoxingInput` while Flow consumes `BodyCellInput` or Flow-shaped intents. Derrick tentatively agrees, but wants to see examples/suggestions before fully freezing that input contract split.
+The v1 architecture discussion is frozen with Derrick's correction that Boxing punch inputs do not carry a power concept. The next slice should create a separate implementation plan before changing mode/input/runner contracts.
 
 ### Input Contract Example Recommendation
 
 The inspected contracts already support the proposed split:
 
 - `aerobeat-input-core/src/interfaces/body_cell_input.gd` owns generic calibrated body-cell events: `left_wrist_cell_entered(cell, direction)`, `right_wrist_cell_entered(cell, direction)`, `nose_cell_entered(cell, direction)`, and `calibration_session_updated(session)`.
-- `aerobeat-input-core/src/interfaces/boxing_input.gd` extends `BodyCellInput`, but the Boxing rule engine should primarily consume explicit boxing events: `straight_left(power)`, `straight_right(power)`, `hook_left(power)`, `hook_right(power)`, `uppercut_left(power)`, `uppercut_right(power)`, `guard_enabled/guard_disabled`, `squat_enabled/squat_disabled`, and `weave_left/right_enabled/disabled`.
+- `aerobeat-input-core/src/interfaces/boxing_input.gd` extends `BodyCellInput`, but the Boxing rule engine should primarily consume explicit boxing events: `straight_left`, `straight_right`, `hook_left`, `hook_right`, `uppercut_left`, `uppercut_right`, `guard_enabled/guard_disabled`, `squat_enabled/squat_disabled`, and `weave_left/right_enabled/disabled`. Punch events are per-arm active events only; there is no v1 `power`, `strength`, or scalar intensity concept.
 - `aerobeat-input-core/src/interfaces/flow_input.gd` extends `BodyCellInput` and currently only adds `squat_enabled/squat_disabled`. That means v1 Flow can treat body-cell entry as its main authored-note input and use Flow-specific state only when an authored beat needs it.
 
 Recommended runner/testbed envelopes should wrap existing signal names rather than replace them:
@@ -141,7 +141,7 @@ Recommended runner/testbed envelopes should wrap existing signal names rather th
 	"contract": "aerobeat.input.boxing.v1",
 	"event": "straight_left",
 	"timestamp_ms": 18420,
-	"payload": {"power": 0.82},
+	"payload": {"arm": "left", "active": true},
 	"source": {"provider_id": "camera_tracking", "frame_index": 934, "confidence": 0.91}
 }
 ```
@@ -162,7 +162,7 @@ Recommended ownership:
 
 - `aerobeat-input-core`: stable signal names, body-cell grid semantics, direction names/constants, provider lifecycle/capability seams, calibration-session shape, and optional runner envelope vocabulary.
 - `aerobeat-input-camera-tracking`: pose-frame ingestion, calibration implementation, detector substrate, gesture/body-cell translation, YAML tuning, and debug payloads.
-- `aerobeat-mode-boxing`: authored boxing target -> explicit `BoxingInput` event evaluation, scoring windows, power thresholds, combo/streak state, and local tests.
+- `aerobeat-mode-boxing`: authored boxing target -> explicit `BoxingInput` event evaluation, scoring windows, hit/active-state thresholds, combo/streak state, and local tests.
 - `aerobeat-mode-flow`: authored BeatSaver-converted note -> `BodyCellInput` / small Flow state evaluation, direction/cell timing, squat authored beats if retained, and local tests.
 
 Before implementation, freeze/document direction names and the 4x3 body-cell grid: cell indexes are `0..11`, BeatSaver row-major / athlete-space top-left, and current detector code uses `0=up`, `1=down`, `2=right`, `3=left` for cell transitions in athlete-space grid terms. Do not promote camera-tracking debug signals such as punch-family `*_state_changed` into the shared v1 input contract.
@@ -368,9 +368,9 @@ Recommended rename sequence:
 **Files Created/Deleted/Modified:**
 - `Pending coder output`
 
-**Status:** Pending Human Review
+**Status:** Complete
 
-**Results:** Not started.
+**Results:** Derrick completed the final freeze decision with one correction: Boxing punch events are active/inactive per-arm events and do not carry `power`, `strength`, or scalar intensity in v1. The plan and bead `afc-n5l` were updated with the frozen architecture, and bead `afc-n5l` was closed. Implementation remains gated behind a separate next implementation plan.
 
 ---
 
@@ -648,11 +648,11 @@ Recommended rename sequence:
 
 ## Final Results
 
-**Status:** Pending Derrick final input split confirmation
+**Status:** Complete
 
-**What We Built:** Architecture discussion plan and beads initialized. Runner boundary and repo structure were approved; `aerobeat-gameplay-runner` was generated and audited. The in-place `feature` repo/template rename to `mode` was implemented, QA verified, audited, committed, and pushed. Canonical serialized content schema migration from `feature` to `mode` was implemented as a hard-breaking migration, QA verified, audited, committed, and pushed. The architecture freeze is now accepted except for Derrick's final confirmation of the input-contract example recommendation.
+**What We Built:** Architecture discussion plan and beads initialized. Runner boundary and repo structure were approved; `aerobeat-gameplay-runner` was generated and audited. The in-place `feature` repo/template rename to `mode` was implemented, QA verified, audited, committed, and pushed. Canonical serialized content schema migration from `feature` to `mode` was implemented as a hard-breaking migration, QA verified, audited, committed, and pushed. The v1 gameplay architecture is frozen: Boxing consumes explicit per-arm `BoxingInput` punch/state events with no power concept, Flow consumes `BodyCellInput` or Flow-shaped intents, runner owns session orchestration and binds timing to `aerobeat-audio-player`, fixtures combine purpose-built and BeatSaver-converted maps, and `aerobeat-assembly-community` stays a late production consumer.
 
-**Reference Check:** Research checked current mode, input, content, tool/vendor, assembly, environment, UI, docs, and handoff references. Derrick approved the runner boundary, root/testbed shape, in-place mode repo rename, template rename, canonical schema migration, runner use of `aerobeat-audio-player` timing, fixture strategy, and runner-first integration. Final architecture freeze for gameplay implementation is pending only the input-contract split confirmation.
+**Reference Check:** Research checked current mode, input, content, tool/vendor, assembly, environment, UI, docs, and handoff references. Derrick approved the runner boundary, root/testbed shape, in-place mode repo rename, template rename, canonical schema migration, runner use of `aerobeat-audio-player` timing, fixture strategy, runner-first integration, and final Boxing/Flow input split with the explicit no-power correction for punches.
 
 **Commits:**
 - `a862f27` - Create gameplay runner scaffold (`aerobeat-gameplay-runner`)
@@ -671,3 +671,5 @@ Recommended rename sequence:
 ---
 
 *Drafted on 2026-08-01*
+
+*Completed on 2026-08-01*
