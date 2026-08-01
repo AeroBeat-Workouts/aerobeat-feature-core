@@ -2,7 +2,7 @@
 
 **Date:** 2026-08-01
 **Status:** In Progress
-**Last Updated:** 2026-08-01 15:27 EDT
+**Last Updated:** 2026-08-01 15:40 EDT
 **Blocked Reason:** None
 **Agent:** pico
 
@@ -20,7 +20,9 @@ The latest AeroBeat handoff says the previous camera/input proving-scenes cleanu
 
 This plan uses `aerobeat-feature-core` as the owning repo because it is the canonical home for shared gameplay-mode and runtime-rule contracts. The planning pass should inspect the active gameplay repos, input contract repos, maps/content repos, assembly workbench shape, and any missing repo boundaries, then produce a concrete responsibility split for the first gameplay implementation wave.
 
-This is primarily a discussion-first execution slice. No implementation work should start until the architecture split is explicit, the feature repo boundaries are agreed and frozen, the input-repo dependency shape is clear, and Derrick approves the next implementation plan. AeroBeat is a polyrepo project, so a clean new repo boundary is preferred over stuffing unrelated gameplay concerns into `aerobeat-feature-boxing`, `aerobeat-feature-flow`, or `aerobeat-feature-core`.
+This is primarily a discussion-first execution slice. No implementation work should start until the architecture split is explicit, the mode repo boundaries are agreed and frozen, the input-repo dependency shape is clear, and Derrick approves the next implementation plan. AeroBeat is a polyrepo project, so a clean new repo boundary is preferred over stuffing unrelated gameplay concerns into the Boxing, Flow, or shared mode contract repos.
+
+Derrick approved the `aerobeat-gameplay-runner` boundary: the runner is where AeroBeat runs a song with either Boxing or Flow gameplay, while the rules for those modes stay in the gameplay-mode repos. During this same architecture section, Derrick also requested a rename audit from `feature` terminology to `mode` terminology across the AeroBeat polyrepo before implementation begins.
 
 ---
 
@@ -43,23 +45,23 @@ This is primarily a discussion-first execution slice. No implementation work sho
 
 ## Working Boundary Proposal
 
-This section is the live discussion surface. It is not frozen until Derrick explicitly agrees.
+This section is the live discussion surface. The runner boundary is approved; final implementation architecture remains open until the `feature` -> `mode` rename impact and repo scaffold shape are confirmed.
 
 ### Current Constraints
 
-- Official v1 gameplay remains Boxing and Flow only.
+- Official v1 gameplay modes remain Boxing and Flow only.
 - Official v1 gameplay input remains camera only.
 - Mouse and touch are valid for UI/navigation, not official v1 gameplay parity.
 - Keyboard, XR, Joy-Con, and native/mobile MediaPipe stay future/debug/exploration lanes unless a later plan promotes them.
-- Feature repos should not talk directly to webcams, vendor runtimes, raw MediaPipe payloads, or camera-preview ownership.
+- Mode repos should not talk directly to webcams, vendor runtimes, raw MediaPipe payloads, or camera-preview ownership.
 - Content repos should not own gameplay scoring, runtime interpretation, UI, tools, or environment/coaching behavior.
 - Assembly repos compose runnable products; they should wire concrete dependencies rather than become the source of reusable gameplay contracts.
 
 ### Preliminary Repo Responsibilities
 
-- `aerobeat-feature-core`: shared gameplay-mode vocabulary, runtime-rule interfaces, feature lifecycle/state/scoring result contracts, and cross-feature rule seams reused by Boxing and Flow.
-- `aerobeat-feature-boxing`: Boxing-specific chart interpretation, hit-window/rule evaluation, scoring semantics, combo/streak behavior, Boxing workbench scenes/tests, and any Boxing-specific visuals that are part of gameplay feedback.
-- `aerobeat-feature-flow`: Flow-specific chart interpretation, grid/object/rule evaluation, scoring semantics, Flow workbench scenes/tests, and Flow-specific gameplay feedback.
+- `aerobeat-feature-core` -> target `aerobeat-mode-core`: shared gameplay-mode vocabulary, runtime-rule interfaces, mode lifecycle/state/scoring result contracts, and cross-mode rule seams reused by Boxing and Flow.
+- `aerobeat-feature-boxing` -> target `aerobeat-mode-boxing`: Boxing-specific chart interpretation, hit-window/rule evaluation, scoring semantics, combo/streak behavior, Boxing workbench scenes/tests, and any Boxing-specific visuals that are part of gameplay feedback.
+- `aerobeat-feature-flow` -> target `aerobeat-mode-flow`: Flow-specific chart interpretation, grid/object/rule evaluation, scoring semantics, Flow workbench scenes/tests, and Flow-specific gameplay feedback.
 - `aerobeat-content-core`: durable song-package, song, chart, set, schema, validation, and authored/imported content relationship rules, including Boxing/Flow chart object vocabulary where it is content truth rather than runtime behavior.
 - `aerobeat-input-core`: stable provider/session/intent contracts, `BoxingInput`, `FlowInput`, `BodyCellInput`, UI interaction bridge contracts, and normalized lifecycle seams.
 - `aerobeat-tool-camera-tracking`: vendor-agnostic camera lifecycle, source selection, preview ownership, backend resolution, and normalized tracking-frame publication.
@@ -77,16 +79,16 @@ There appears to be a clean potential boundary for a shared gameplay session/run
 - owner role: runtime composition state that is neither pure feature contract nor Boxing/Flow-specific logic
 - concrete responsibilities: selected song package/chart, active feature runner selection, timeline clock binding to audio, input subscription wiring, event dispatch, per-session lifecycle, pause/resume/retry, common gameplay result envelope, and assembly-facing scene/controller glue
 - possible consumers: assemblies, feature workbenches, and future product-specific clients
-- possible dependencies: `aerobeat-feature-core`, `aerobeat-content-core`, `aerobeat-input-core`, and narrowly any timing/audio contract if needed
+- possible dependencies: target `aerobeat-mode-core`, `aerobeat-content-core`, `aerobeat-input-core`, and narrowly any timing/audio contract if needed
 - explicit non-goals: no camera lifecycle, no detector logic, no BeatSaver conversion, no UI shell chrome, no environment loading, no concrete feature-specific judgement
 
 The open question is whether this layer earns a new repo now, or whether the first implementation wave can keep the conductor inside `aerobeat-assembly-community` until the shared seam is proven.
 
 ### Proposed Dependency Direction
 
-- feature repos -> `aerobeat-feature-core`
-- feature repos -> `aerobeat-content-core` only when they consume chart/content contracts
-- feature repos -> `aerobeat-input-core` for intent interfaces and fake/test streams, not concrete camera providers
+- mode repos -> target `aerobeat-mode-core`
+- mode repos -> `aerobeat-content-core` only when they consume chart/content contracts
+- mode repos -> `aerobeat-input-core` for intent interfaces and fake/test streams, not concrete camera providers
 - concrete input providers -> `aerobeat-input-core`
 - `aerobeat-input-camera-tracking` -> `aerobeat-tool-camera-tracking` for normalized tracking frames and provider lifecycle
 - vendor repos -> tool repos or concrete provider repos, not feature repos
@@ -95,20 +97,156 @@ The open question is whether this layer earns a new repo now, or whether the fir
 
 ### First Implementation Sequence After Freeze
 
-1. Create `aerobeat-gameplay-runner` if Derrick approves the new boundary.
-2. Normalize `aerobeat-feature-boxing` and `aerobeat-feature-flow` testbed manifests around `feature-core`, `content-core`, `input-core`, and GUT/headless validation.
-3. Add minimal `feature-core` DTOs/interfaces for feature runner contracts, results, timing hooks, and lifecycle vocabulary.
-4. Implement feature-local pure rule engines against fixture charts and fake input intent streams before live camera binding.
-5. Wire `aerobeat-assembly-community` last through `addons.jsonc` once runner, features, content contracts, and camera input composition are proven.
+1. Audit and plan the `feature` -> `mode` rename across repos, code symbols, docs, manifests, dependency keys, and GitHub repo names.
+2. Confirm the `aerobeat-gameplay-runner` repo folder structure with Derrick before generating the GitHub repo.
+3. Create `aerobeat-gameplay-runner` after confirmation, using the approved package/testbed shape.
+4. Normalize the target Boxing and Flow mode repo testbed manifests around mode-core, content-core, input-core, and GUT/headless validation.
+5. Add minimal mode-core DTOs/interfaces for runner contracts, results, timing hooks, and lifecycle vocabulary.
+6. Implement mode-local pure rule engines against fixture charts and fake input intent streams before live camera binding.
+7. Wire `aerobeat-assembly-community` last through `addons.jsonc` once runner, modes, content contracts, and camera input composition are proven.
 
 ### Unresolved Freeze Questions
 
-- Should we approve `aerobeat-gameplay-runner` now, or allow a temporary assembly-only conductor while feature contracts mature?
+- Which exact rename sequence should we use for GitHub repos and local folders: rename existing repos in place, create new mode repos and migrate, or phased aliases?
+- Should serialized content/package/chart schema fields currently named `feature` remain as data-contract terminology for now, or migrate to `mode` through an explicit schema-version compatibility wave?
 - Should the runner own audio-clock binding and chart timeline dispatch, or delegate clocking to an audio/tool package while only subscribing to timing events?
-- Should feature repos expose pure rule engines only, or also package Godot scenes/controllers for their in-game lane visuals?
+- Should mode repos expose pure rule engines only, or also package Godot scenes/controllers for their in-game lane visuals?
 - For v1, should Boxing and Flow both consume the same `BodyCellInput` lane where possible, or should Boxing primarily consume explicit `BoxingInput` events and reserve body-cell for debug/calibration?
 - Should first fixtures come from converted BeatSaver `song-package.yaml` output, hand-authored minimal fixtures, or both?
 - Should `aerobeat-assembly-community` be the first integration target immediately, or should the new gameplay runner/workbench prove composition first?
+
+## Proposed `aerobeat-gameplay-runner` Repo Shape
+
+This repo should be a reusable Godot package repo with a hidden `.testbed`, not an assembly app and not a tool repo.
+
+Proposed root structure:
+
+```text
+aerobeat-gameplay-runner/
+├── .beads/
+├── .github/
+│   └── workflows/
+│       ├── cla.yml
+│       └── gut_ci.yml
+├── .plans/
+├── .testbed/
+│   ├── addons.jsonc
+│   ├── project.godot
+│   ├── scenes/
+│   │   └── gameplay_runner_testbed.tscn
+│   └── tests/
+│       └── test_gameplay_runner_contract.gd
+├── src/
+│   ├── AeroGameplayRunner.gd
+│   ├── data_types/
+│   │   ├── gameplay_run_config.gd
+│   │   ├── gameplay_run_result.gd
+│   │   └── gameplay_run_state.gd
+│   ├── interfaces/
+│   │   ├── gameplay_mode_runner.gd
+│   │   ├── gameplay_timeline_clock.gd
+│   │   └── gameplay_input_stream.gd
+│   └── runtime/
+│       ├── gameplay_session.gd
+│       ├── gameplay_event_dispatcher.gd
+│       └── gameplay_score_aggregator.gd
+├── .gitignore
+├── LICENSE.md
+├── README.md
+└── plugin.cfg
+```
+
+Proposed `.testbed/addons.jsonc` local bootstrap:
+
+```jsonc
+{
+  "$schema": "https://chickensoft.games/schemas/addons.schema.json",
+  "addons": {
+    "aerobeat-mode-core": {
+      "url": "../../aerobeat-mode-core",
+      "subfolder": "/",
+      "source": "symlink"
+    },
+    "aerobeat-content-core": {
+      "url": "../../aerobeat-content-core",
+      "subfolder": "/",
+      "source": "symlink"
+    },
+    "aerobeat-input-core": {
+      "url": "../../aerobeat-input-core",
+      "subfolder": "/",
+      "source": "symlink"
+    },
+    "aerobeat-tool-audio-player": {
+      "url": "../../aerobeat-tool-audio-player",
+      "subfolder": "/",
+      "source": "symlink"
+    },
+    "aerobeat-tool-headless-manager": {
+      "url": "../../aerobeat-tool-headless-manager",
+      "subfolder": "/",
+      "source": "symlink"
+    },
+    "aerobeat-vendor-godot-unit-test": {
+      "url": "../../aerobeat-vendor-godot-unit-test",
+      "subfolder": "/",
+      "source": "symlink"
+    }
+  }
+}
+```
+
+Proposed `plugin.cfg`:
+
+```ini
+[plugin]
+
+name="AeroBeat Gameplay Runner"
+description="Shared song-run orchestration for running AeroBeat content with an approved gameplay mode such as Boxing or Flow."
+author="AeroBeat Workouts"
+version="0.0.1"
+```
+
+Initial non-goals:
+
+- no concrete Boxing or Flow rules
+- no camera lifecycle or provider implementation
+- no BeatSaver acquisition/conversion
+- no menu/UI shell chrome
+- no assembly-specific app scenes
+- no environment loading beyond accepting future assembly-provided context
+
+## `feature` To `mode` Rename Audit
+
+Read-only audit result: exact `aerobeat-feature-*` references appear in 40 material files outside ignored/generated/cache areas. The active direct rename targets are:
+
+- `aerobeat-feature-core` -> `aerobeat-mode-core`
+- `aerobeat-feature-boxing` -> `aerobeat-mode-boxing`
+- `aerobeat-feature-flow` -> `aerobeat-mode-flow`
+- likely `aerobeat-template-feature` -> `aerobeat-template-mode`
+
+Material update areas:
+
+- GitHub repo names, local folder names, and git remotes.
+- GodotEnv addon keys/URLs, especially Flow and template manifests that currently pin `aerobeat-feature-core`; Boxing should be normalized to mode-core during the same dependency cleanup.
+- `plugin.cfg` names/descriptions, `.testbed/project.godot` display names, and tests that assert old labels.
+- `aerobeat-docs` publishing paths, template docs, generated API source paths, licensing/category docs, and docs navigation from `api/features` toward `api/modes`.
+- Product wording in live READMEs and docs that says "gameplay features" when the desired product term is "gameplay modes".
+- Current active plans should migrate to mode terminology; archive plans should remain historical except for transition notes when needed.
+
+Important schema caveat:
+
+- `feature` inside `aerobeat-content-core` and `aerobeat-tool-content-authoring` is a serialized content/package/chart contract field today. It affects fixtures, validators, importer output, error codes such as `invalid_feature`, and taxonomy docs. Do not bulk rename that field unless Derrick explicitly approves a versioned schema migration.
+
+Recommended rename sequence:
+
+1. Freeze naming and schema policy: repo/lane terminology becomes `mode`; serialized content field `feature` either stays for now or gets a planned compatibility migration.
+2. Rename GitHub repos in place where possible, update local folders and `origin` remotes, and rely on GitHub redirects only as a temporary cushion.
+3. Update GodotEnv manifests/addon keys and validate installs.
+4. Update repo-local README/plugin/project/test labels.
+5. Update docs/templates/publish tooling, move docs paths from `api/features` to `api/modes` if approved, then regenerate docs.
+6. Optionally run the versioned content-schema migration.
+7. Validate with exact `rg`, GodotEnv restore/import/GUT in touched repos, and docs build/publish dry run.
 
 ## Tasks
 
@@ -172,11 +310,51 @@ The open question is whether this layer earns a new repo now, or whether the fir
 
 ---
 
+### Task 4: Audit `feature` To `mode` Rename Impact
+
+**Bead ID:** `afc-enq`
+**SubAgent:** `primary`
+**Role:** `research`
+**References:** `REF-02`, `REF-03`, `REF-04`, `REF-08`, `REF-09`
+**Prompt:** You are the `research` role on the `primary` lane for AeroBeat. Claim bead `afc-enq` with `bd update afc-enq --status in_progress --json`. Audit the AeroBeat polyrepo for renaming `feature` terminology to `mode`, including repo names, local folders, GitHub references, README/docs terminology, GodotEnv manifests, addon keys, plugin.cfg names, GDScript class/file names, tests, plans, and CI/scripts. Do not modify code. Update bead `afc-enq` with a migration inventory, ordering risks, and recommended phased rename strategy; do not close the bead.
+
+**Folders Created/Deleted/Modified:**
+- `.plans/`
+
+**Files Created/Deleted/Modified:**
+- `.plans/2026-08-01-aerobeat-gameplay-architecture-resume.md`
+
+**Status:** In Progress
+
+**Results:** Read-only audit completed. Findings are summarized in the `feature` To `mode` Rename Audit section and stored in bead `afc-enq`. Main risk is that serialized content fields named `feature` are data-contract surface and should not be blindly renamed.
+
+---
+
+### Task 5: Confirm `aerobeat-gameplay-runner` Repo Shape
+
+**Bead ID:** `afc-67x`
+**SubAgent:** `primary`
+**Role:** `research`
+**References:** `REF-02`, `REF-03`, `REF-04`, `REF-08`, `REF-09`
+**Prompt:** You are the `research` role on the `primary` lane for AeroBeat. Claim bead `afc-67x` with `bd update afc-67x --status in_progress --json`. Inspect current AeroBeat template/package repos and propose the exact folder/file structure for `aerobeat-gameplay-runner`. Do not create the GitHub repo or local repo. Update bead `afc-67x` with the proposed structure and confirmation checklist; do not close the bead until Derrick confirms.
+
+**Folders Created/Deleted/Modified:**
+- `.plans/`
+
+**Files Created/Deleted/Modified:**
+- `.plans/2026-08-01-aerobeat-gameplay-architecture-resume.md`
+
+**Status:** In Progress
+
+**Results:** Derrick approved the runner concept and asked to confirm the folder structure before repo generation.
+
+---
+
 ## Final Results
 
 **Status:** Pending
 
-**What We Built:** Architecture discussion plan and bead initialized. Implementation is explicitly deferred until Derrick freezes the architecture.
+**What We Built:** Architecture discussion plan and beads initialized. Runner boundary approved; rename audit and runner repo structure confirmation are now active. Implementation and GitHub repo generation remain deferred until Derrick confirms the scaffold shape.
 
 **Reference Check:** Research checked current feature, input, content, tool/vendor, assembly, environment, UI, docs, and handoff references. Derrick freeze decision pending.
 
