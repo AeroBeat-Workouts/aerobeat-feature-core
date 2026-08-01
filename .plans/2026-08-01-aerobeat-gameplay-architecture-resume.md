@@ -1,7 +1,7 @@
 # AeroBeat Gameplay Architecture Resume
 
 **Date:** 2026-08-01
-**Status:** In Progress
+**Status:** Complete
 **Last Updated:** 2026-08-01 16:05 EDT
 **Blocked Reason:** None
 **Agent:** pico
@@ -385,7 +385,7 @@ Recommended rename sequence:
 
 **Status:** In Progress
 
-**Results:** Spawned `primary` research subagent `aerobeat_mode_rename_inventory` to produce the ordered rename/schema execution inventory. Awaiting subagent completion.
+**Results:** Completed read-only ordered execution inventory in bead `afc-fzs` and closed the bead. Inventory covers in-place GitHub/local repo renames, `aerobeat-template-feature` rename, GodotEnv manifests, docs/API path moves, README/plugin/project label updates, `ContentFeature`/`content_feature` rename, canonical serialized `feature` -> `mode` schema migration, `invalid_feature`/`chart_descriptor_feature_mismatch` error-code migration, fixtures, importer/tooling output, and validation commands. Main risk: `aerobeat-content-core` and `aerobeat-tool-content-authoring` must migrate in the same implementation wave or authoring/import tooling will keep emitting legacy canonical `feature` fields after validators expect `mode`.
 
 ---
 
