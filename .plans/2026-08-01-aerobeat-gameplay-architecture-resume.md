@@ -2,7 +2,7 @@
 
 **Date:** 2026-08-01
 **Status:** In Progress
-**Last Updated:** 2026-08-01 16:42 EDT
+**Last Updated:** 2026-08-01 16:45 EDT
 **Blocked Reason:** None
 **Agent:** pico
 
@@ -575,9 +575,9 @@ Recommended rename sequence:
 **Files Created/Deleted/Modified:**
 - `Pending auditor output`
 
-**Status:** In Progress
+**Status:** Complete
 
-**Results:** Bead created with dependency on `aerobeat-content-core-56d`. QA bead is now closed; launching audit.
+**Results:** Audit passed and closed bead `aerobeat-content-core-5sd` at 2026-08-01 16:44 EDT. Evidence checked: `aerobeat-content-core` clean at `HEAD == origin/main == b383c6c`; `aerobeat-tool-content-authoring` clean at `HEAD == origin/main == 7673d03`; active code/fixtures/docs now use `mode` as the canonical serialized field for charts, package chart descriptors, content queries, validators, tests, YAML codec, DTO/write paths, and BeatSaver/external importer output; targeted scans found no material legacy canonical `feature` field, old error names, `ContentFeature`, `content_feature`, `VALID_FEATURES`, or feature-named files; remaining `feature` mentions are unrelated `featuredCoaches` / featured coach metadata. Auditor re-ran content-core contract tests, authoring tool tests, and `git diff --check` successfully. Known Godot resource cleanup warnings remain non-blocking because tests exit 0. Beads/Dolt `no common ancestor` remains a tracking-storage caveat, not a code/schema completion gap; filed follow-up bead `aerobeat-content-core-gyn`.
 
 ---
 
@@ -585,14 +585,23 @@ Recommended rename sequence:
 
 **Status:** Pending
 
-**What We Built:** Architecture discussion plan and beads initialized. Runner boundary and repo structure were approved; `aerobeat-gameplay-runner` was generated and audited. The in-place `feature` repo/template rename to `mode` was implemented, QA verified, audited, committed, and pushed. Canonical serialized content schema migration from `feature` to `mode` is now the next implementation slice.
+**What We Built:** Architecture discussion plan and beads initialized. Runner boundary and repo structure were approved; `aerobeat-gameplay-runner` was generated and audited. The in-place `feature` repo/template rename to `mode` was implemented, QA verified, audited, committed, and pushed. Canonical serialized content schema migration from `feature` to `mode` was implemented as a hard-breaking migration, QA verified, audited, committed, and pushed.
 
-**Reference Check:** Research checked current mode, input, content, tool/vendor, assembly, environment, UI, docs, and handoff references. Derrick freeze decision pending.
+**Reference Check:** Research checked current mode, input, content, tool/vendor, assembly, environment, UI, docs, and handoff references. Derrick approved the runner boundary, root/testbed shape, in-place mode repo rename, template rename, and canonical schema migration. Final architecture freeze for gameplay implementation is still pending discussion.
 
 **Commits:**
-- Pending
+- `a862f27` - Create gameplay runner scaffold (`aerobeat-gameplay-runner`)
+- `d8bee6a` - Current `aerobeat-mode-core` repo rename head before plan updates
+- `0106a50` - Current `aerobeat-mode-boxing` repo rename head
+- `795e02a` - Current `aerobeat-mode-flow` repo rename head
+- `0fa83f0` - Current `aerobeat-template-mode` repo rename head
+- `b383c6c` - Migrate content schema feature field to mode (`aerobeat-content-core`)
+- `7673d03` - Migrate authoring chart field to mode (`aerobeat-tool-content-authoring`)
+- `085efe3` - Update AeroBeat mode migration plan (`aerobeat-mode-core`)
+- `34d8fae` - Record AeroBeat schema migration handoff (`aerobeat-mode-core`)
+- `a1ae07b` - Record AeroBeat schema migration QA (`aerobeat-mode-core`)
 
-**Lessons Learned:** Pending
+**Lessons Learned:** Keep repo identity rename, serialized schema migration, and Beads storage repair as separate beads even when they are part of one terminology wave; it made QA/audit scope much cleaner.
 
 ---
 
