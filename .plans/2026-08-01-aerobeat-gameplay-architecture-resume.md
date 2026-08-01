@@ -2,7 +2,7 @@
 
 **Date:** 2026-08-01
 **Status:** In Progress
-**Last Updated:** 2026-08-01 16:38 EDT
+**Last Updated:** 2026-08-01 16:42 EDT
 **Blocked Reason:** None
 **Agent:** pico
 
@@ -554,9 +554,9 @@ Recommended rename sequence:
 **Files Created/Deleted/Modified:**
 - `Pending QA output`
 
-**Status:** In Progress
+**Status:** Complete
 
-**Results:** Bead created with dependency on `aerobeat-content-core-v28`. Implementation bead is now closed; launching QA.
+**Results:** QA passed and closed bead `aerobeat-content-core-56d` at 2026-08-01 16:41 EDT. Evidence checked: `aerobeat-content-core` clean at `HEAD == origin/main == b383c6c`; `aerobeat-tool-content-authoring` clean at `HEAD == origin/main == 7673d03`; canonical serialized chart/package/chart-descriptor field is now `mode`; active code no longer accepts/writes legacy `feature` as canonical schema; targeted scans found no active `feature` reads/writes, old error codes, `ContentFeature`, `content_feature`, or `VALID_FEATURES`; remaining `feature` hits are unrelated `featuredCoaches`, Godot `config/features`, or archived plan text. QA re-ran content-core contract tests, authoring tool tests, and `git diff --check` in both repos successfully. Godot cleanup warnings in authoring test output were not treated as schema migration failures.
 
 ---
 
@@ -575,9 +575,9 @@ Recommended rename sequence:
 **Files Created/Deleted/Modified:**
 - `Pending auditor output`
 
-**Status:** Pending
+**Status:** In Progress
 
-**Results:** Bead created with dependency on `aerobeat-content-core-56d`.
+**Results:** Bead created with dependency on `aerobeat-content-core-56d`. QA bead is now closed; launching audit.
 
 ---
 
