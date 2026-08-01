@@ -2,8 +2,8 @@
 
 **Date:** 2026-08-01
 **Status:** In Progress
-**Last Updated:** 2026-08-01 16:49 EDT
-**Blocked Reason:** Pending Derrick architecture freeze decisions for bead `afc-n5l`; implementation planning should not advance until the gameplay boundaries and next implementation slice are explicitly frozen.
+**Last Updated:** 2026-08-01 17:47 EDT
+**Blocked Reason:** Pending Derrick architecture freeze decisions for bead `afc-n5l`; implementation planning should not advance until the gameplay boundaries and next implementation slice are explicitly frozen. Current freeze prompt is whether to accept or change the six recommended defaults for runner ownership, audio-clock delegation, pure mode rule engines plus optional workbenches, explicit Boxing/Flow input contracts, dual fixture strategy, and runner `.testbed` integration before assembly integration.
 **Agent:** pico
 
 ---
@@ -511,7 +511,7 @@ Recommended rename sequence:
 **Files Created/Deleted/Modified:**
 - `Pending auditor output`
 
-**Status:** In Progress
+**Status:** Complete
 
 **Results:** Audit passed and closed bead `afc-dog` at 2026-08-01 16:29 EDT. Evidence checked: GitHub repos resolve under the approved `aerobeat-mode-*` and `aerobeat-template-mode` names, old GitHub names redirect to renamed repos, local old folders are absent, new folders/remotes are renamed, all four checkouts are clean on `main` with `HEAD == origin/main`, expected rename commits are pushed, residual exact old-name scans outside archive/history are clean, and remaining active-plan `feature` mentions are explicit audit/schema-migration narrative rather than live repo identity. The auditor correctly scoped this bead to the in-place repo/template rename wave; serialized content schema migration remains a separate approved slice.
 
