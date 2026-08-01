@@ -283,7 +283,7 @@ Recommended rename sequence:
 **Files Created/Deleted/Modified:**
 - `.plans/2026-08-01-aerobeat-gameplay-architecture-resume.md`
 
-**Status:** In Progress
+**Status:** Complete
 
 **Results:** Research pass completed and wrote proposal details into bead `afc-n5l`. Repo boundary findings are summarized in the Working Boundary Proposal. Implementation remains out of scope until the architecture is frozen.
 
@@ -405,7 +405,47 @@ Recommended rename sequence:
 
 **Status:** In Progress
 
-**Results:** Spawned `primary` coder subagent `aerobeat_gameplay_runner_scaffold` to create the GitHub repo and local scaffold using the approved root/package and hidden `.testbed` shape. Awaiting subagent completion.
+**Results:** Created and pushed `aerobeat-gameplay-runner` to `https://github.com/AeroBeat-Workouts/aerobeat-gameplay-runner` at commit `a862f27` (`Create gameplay runner scaffold`). Orchestrator verified local checkout is on `main...origin/main`, root has no `project.godot` and no `addons.jsonc`, and `.testbed/` contains the Godot project and GodotEnv manifest. Coder validation reported `godotenv addons install`, Godot headless import, and GUT passing 1 script / 1 test / 9 assertions, with existing vendored GUT UID fallback warnings plus Godot exit leak warning.
+
+---
+
+### Task 8: QA Verify `aerobeat-gameplay-runner` Scaffold
+
+**Bead ID:** `afc-p0z`
+**SubAgent:** `primary`
+**Role:** `qa`
+**References:** `REF-07`, `REF-08`, `REF-10`
+**Prompt:** You are the `qa` role on the `primary` lane for AeroBeat. Claim bead `afc-p0z` with `bd update afc-p0z --status in_progress --json`. Independently verify the `aerobeat-gameplay-runner` scaffold after coder handoff. Confirm remote/commit, root has no `project.godot` or `addons.jsonc`, `.testbed` owns Godot project/GodotEnv/test assets, GodotEnv install/import/GUT validation passes or failures are documented, and repo is clean/up to date. Update and close bead `afc-p0z` when QA is complete.
+
+**Folders Created/Deleted/Modified:**
+- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-gameplay-runner/`
+
+**Files Created/Deleted/Modified:**
+- `Pending QA output`
+
+**Status:** In Progress
+
+**Results:** Spawned `primary` QA subagent `aerobeat_gameplay_runner_qa`. Awaiting QA completion.
+
+---
+
+### Task 9: Audit `aerobeat-gameplay-runner` Scaffold Completion
+
+**Bead ID:** `afc-3d9`
+**SubAgent:** `primary`
+**Role:** `auditor`
+**References:** `REF-07`, `REF-08`, `REF-10`
+**Prompt:** You are the `auditor` role on the `primary` lane for AeroBeat. Claim bead `afc-3d9` with `bd update afc-3d9 --status in_progress --json` after QA bead `afc-p0z` is closed. Independently audit that the runner scaffold satisfies the approved plan, bead `afc-nfq` notes, QA evidence, and root/testbed constraints. Close bead `afc-3d9` only if completion is truthful and pushed.
+
+**Folders Created/Deleted/Modified:**
+- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-gameplay-runner/`
+
+**Files Created/Deleted/Modified:**
+- `Pending auditor output`
+
+**Status:** Pending QA
+
+**Results:** Blocked by QA bead `afc-p0z`.
 
 ---
 
