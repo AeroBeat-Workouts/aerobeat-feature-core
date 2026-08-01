@@ -2,8 +2,8 @@
 
 **Date:** 2026-08-01
 **Status:** In Progress
-**Last Updated:** 2026-08-01 16:45 EDT
-**Blocked Reason:** None
+**Last Updated:** 2026-08-01 16:49 EDT
+**Blocked Reason:** Pending Derrick architecture freeze decisions for bead `afc-n5l`; implementation planning should not advance until the gameplay boundaries and next implementation slice are explicitly frozen.
 **Agent:** pico
 
 ---
@@ -115,7 +115,6 @@ The open question is whether this layer earns a new repo now, or whether the fir
 
 ### Unresolved Freeze Questions
 
-- What exact compatibility policy should the schema migration use: hard breaking rename only, or accept old `feature` input with warnings while writing canonical `mode` output?
 - Should the runner own audio-clock binding and chart timeline dispatch, or delegate clocking to an audio/tool package while only subscribing to timing events?
 - Should mode repos expose pure rule engines only, or also package Godot scenes/controllers for their in-game lane visuals?
 - For v1, should Boxing and Flow both consume the same `BodyCellInput` lane where possible, or should Boxing primarily consume explicit `BoxingInput` events and reserve body-cell for debug/calibration?
@@ -443,7 +442,7 @@ Recommended rename sequence:
 **Files Created/Deleted/Modified:**
 - `Pending auditor output`
 
-**Status:** In Progress
+**Status:** Complete
 
 **Results:** Audit passed and closed bead `afc-3d9`. Evidence checked: runner remote is `git@github.com:AeroBeat-Workouts/aerobeat-gameplay-runner.git`; local HEAD and `origin/main` both point to `a862f27d14d1d9e15691dac1ac1487cc75921097`; root has no `project.godot`, no `addons.jsonc`, and no root GodotEnv manifest; `.testbed/` owns `project.godot`, `addons.jsonc`, showcase scene, tests, and `assets/README.md`; root package shape matches the approved package-only scaffold; `godotenv addons install`, headless import, and GUT validation passed; repo status is clean and up to date.
 
@@ -466,7 +465,7 @@ Recommended rename sequence:
 **Files Created/Deleted/Modified:**
 - `Pending coder output`
 
-**Status:** In Progress
+**Status:** Complete
 
 **Results:** Completed in-place GitHub/local rename wave and focused repair. GitHub repos and local folders now use `aerobeat-mode-core`, `aerobeat-mode-boxing`, `aerobeat-mode-flow`, and `aerobeat-template-mode`. Pushed commits: mode-core `65b4edb` then repair `912ae79`; mode-boxing `d80286b` then repair `0106a50`; mode-flow `1857699` then repair `795e02a`; template-mode `0fa83f0`. Orchestrator verification confirmed all four repos are clean on `main...origin/main`, remotes point to renamed GitHub repos, GitHub repo views resolve, local feature-named folders are gone, and residual active old-name scan only reports historical audit notes in this plan. Serialized content schema migration was intentionally not touched in this bead.
 
