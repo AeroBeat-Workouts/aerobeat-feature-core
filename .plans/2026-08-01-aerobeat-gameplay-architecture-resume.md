@@ -383,7 +383,7 @@ Recommended rename sequence:
 **Files Created/Deleted/Modified:**
 - `.plans/2026-08-01-aerobeat-gameplay-architecture-resume.md`
 
-**Status:** In Progress
+**Status:** Complete
 
 **Results:** Completed read-only ordered execution inventory in bead `afc-fzs` and closed the bead. Inventory covers in-place GitHub/local repo renames, `aerobeat-template-feature` rename, GodotEnv manifests, docs/API path moves, README/plugin/project label updates, `ContentFeature`/`content_feature` rename, canonical serialized `feature` -> `mode` schema migration, `invalid_feature`/`chart_descriptor_feature_mismatch` error-code migration, fixtures, importer/tooling output, and validation commands. Main risk: `aerobeat-content-core` and `aerobeat-tool-content-authoring` must migrate in the same implementation wave or authoring/import tooling will keep emitting legacy canonical `feature` fields after validators expect `mode`.
 
@@ -425,7 +425,7 @@ Recommended rename sequence:
 
 **Status:** In Progress
 
-**Results:** Spawned `primary` QA subagent `aerobeat_gameplay_runner_qa`. Awaiting QA completion.
+**Results:** QA passed and closed bead `afc-p0z`. Evidence: runner remote is `git@github.com:AeroBeat-Workouts/aerobeat-gameplay-runner.git`, branch `main`, HEAD `a862f27d14d1d9e15691dac1ac1487cc75921097` matches `origin/main`; root has no `project.godot`, no `addons.jsonc`, and no GodotEnv manifest; `.testbed/` owns `project.godot`, `addons.jsonc`, scenes, tests, and showcase asset note; `godotenv addons install`, Godot headless import, and GUT passed with 1 script / 1 test / 9 assertions. Repo ended clean and up to date.
 
 ---
 
@@ -443,9 +443,9 @@ Recommended rename sequence:
 **Files Created/Deleted/Modified:**
 - `Pending auditor output`
 
-**Status:** Pending QA
+**Status:** In Progress
 
-**Results:** Blocked by QA bead `afc-p0z`.
+**Results:** QA bead `afc-p0z` is closed. Spawned `primary` auditor subagent `aerobeat_gameplay_runner_audit`. Awaiting audit completion.
 
 ---
 
