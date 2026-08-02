@@ -1,5 +1,8 @@
 # Godot 4+ specific ignores
 .godot/
+.testbed/.godot/
+.testbed/.addons/
+.testbed/addons/
 .nomedia
 
 # Godot-specific ignores
@@ -12,7 +15,7 @@ export_credentials.cfg
 
 # Mono-specific ignores
 .mono/
-data_*/
+/data_*/
 mono_crash.*.json
 
 # Beads / Dolt files (added by bd init)

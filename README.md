@@ -36,11 +36,18 @@ This repo intentionally does **not** own:
 
 ## Current repository contents
 
-Current checked-in content is intentionally minimal:
+Current checked-in code is intentionally centered on the portable v1 mode contract minimum:
 
-- the repo is presently a lane-definition and contract-home placeholder
-- no broader runtime/testbed harness is checked in yet
-- future checked-in code here should stay centered on mode-common rule contracts rather than becoming a catch-all gameplay implementation repo
+- `ModeDescriptor`: portable mode identity, display keys, supported chart/input contracts, and mode contract version
+- `ModeRunConfig`: the mode-local setup subset a runner or mode fixture passes into a rule engine
+- `ModeRunner`: lifecycle interface for pure rule engines: `get_descriptor()`, `start(config)`, `tick(frame)`, `is_complete()`, and `stop(reason)`
+- `ModeTickFrame`: per-tick timeline position/delta plus due chart events and normalized input events
+- `ModeEvent`, `ModeJudgementEvent`, and `ModeScoreDelta`: mode-produced event, judgement, and scoring fragments
+- `ModeRunFragment`: mode-produced lifecycle/summary fragments that a runner can wrap into session results
+- `ModeFixtureCase`: tiny fixture contract shape for mode-local rule tests
+- `.testbed/`: hidden package workbench with focused GUT contract tests
+
+The public contract surface stays data-oriented and runner-agnostic. It does not include session envelopes, clocks, fake input stream implementations, testbed transport, camera/provider debug payloads, raw landmark processing, score aggregation, product UI, or assembly composition.
 
 ## Intended consumers
 
@@ -48,13 +55,13 @@ The active `aerobeat-mode-boxing` and `aerobeat-mode-flow` repos should depend o
 
 ## Development and validation
 
-Current validation for this README-normalization pass is intentionally lightweight:
+Current validation is through the hidden package testbed:
 
-- verify the README matches the shared six-core skeleton
-- verify the wording stays lane-correct against the architecture docs
-- verify the repo does not overclaim inactive modes or unrelated lane ownership
-
-At the moment, no repo-local hidden testbed or automated contract harness is checked in here.
+```bash
+/home/derrick/.openclaw/workspace/scripts/godotenv-sync --repo /home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-mode-core
+godot --headless --path .testbed --import
+godot --headless --path .testbed --script addons/aerobeat-vendor-godot-unit-test/gut_cmdln.gd -gdir=res://tests -ginclude_subdirs -gexit
+```
 
 ## Repository status
 

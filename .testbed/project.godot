@@ -1,0 +1,15 @@
+; Engine Configuration
+config_version=5
+config/features=PackedStringArray("4.6", "Forward Plus")
+
+[application]
+config/name="AeroBeat Mode Core Testbed"
+
+[autoload]
+AeroHeadlessManager="*res://addons/aerobeat-tool-headless-manager/src/AeroHeadlessManager.gd"
+
+[debug]
+gdscript/warnings/untyped_declaration=1
+
+[rendering]
+renderer/rendering_method="forward_plus"
